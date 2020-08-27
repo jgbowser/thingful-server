@@ -233,12 +233,10 @@ function cleanTables(db) {
 }
 
 function seedUsers(db, users) {
-  //console.log('seedUsers', users)
   const preppedUsers = users.map( user => ({
     ...user,
     password: bcrypt.hashSync(user.password, 1)
   }))
-  console.log(preppedUsers)
   return db.into('thingful_users').insert(preppedUsers)
     .then(() => db.raw(`SELECT setval('thingful_users_id_seq', ?)`,
     [users[users.length - 1].id],
@@ -263,8 +261,7 @@ function seedThingsTables(db, users, things, reviews=[]) {
 }
 
 function seedMaliciousThing(db, user, thing) {
-  //console.log(user)
-  return seedUsers(db,user)
+  return seedUsers(db,[user])
     .then(() =>
       db
         .into('thingful_things')
