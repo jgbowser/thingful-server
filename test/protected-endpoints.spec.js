@@ -3,7 +3,7 @@ const app = require('../src/app')
 const helpers = require('./test-helpers')
 const supertest = require('supertest')
 
-describe('Protected endpoints', () => {
+describe.only('Protected endpoints', () => {
 
   let db
   const {
@@ -48,14 +48,15 @@ describe('Protected endpoints', () => {
 
   protectedEndpoints.forEach(endpoint => {
     describe(endpoint.name, () => {
-      it('responds 401 "Missing basic token" when no basic token', () => {
+      it('responds 401 "Missing bearer token" when no bearer token', () => {
         return endpoint.method(endpoint.path)
-          .expect(401, {error: 'Missing basic token' })
+          .expect(401, {error: 'Missing bearer token' })
       })
-      it('responds 401 "Unauthorized request" when no credentials in token', () => {
-        const invalidToken = { user_name: '', password: '' }
+      it('responds 401 "Unauthorized request" when invalid JWT_SECRET', () => {
+        const validUser = testUsers[0]
+        const invalidSecret = 'bad-secret'
         return endpoint.method(endpoint.path)
-          .set('authorization', helpers.makeAuthHeader(invalidToken))
+          .set('authorization', helpers.makeAuthHeader(validUser, invalidSecret))
           .expect(401, { error: 'Unauthorized request' })
       })
       it('responds 401 "Unauthorized request" when invalid username', () => {
